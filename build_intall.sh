@@ -10,8 +10,8 @@ conda create -n intel intelpython3_core python=3
 source activate intel
 conda install cython numpy scipy matplotlib pandas h5py pytables jupyter joblib numba pytest nose -y
 source deactivate
-rm -rf ../.condarc
-mv build_data/.condarc_default ../.condarc
+rm -rf ~/.condarc
+mv build_data/.condarc_default ~/.condarc
 mv build_data/.condarc_default ~/miniconda/envs/intel/.condarc
 conda update conda -y
 conda install numpy scipy matplotlib jupyter pandas h5py pytables jupyter numba pytest nose -y
