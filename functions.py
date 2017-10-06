@@ -19,6 +19,8 @@ import warnings
 from functools import wraps
 from mpi4py import MPI
 rank = MPI.COMM_WORLD.Get_rank()
+
+
 def arguments_determine(j):
     """
     Makes sence of the arguments that are passed through from sys.agrv. 
@@ -28,13 +30,14 @@ def arguments_determine(j):
     """
     A = []
     a = np.copy(sys.argv)
-    #a.reverse()
+    # a.reverse()
     for i in a[::-1]:
         try:
             A.append(int(i))
         except ValueError:
             continue
     return A[j]
+
 
 def unpack_args(func):
     if 'mpi' in sys.argv:
@@ -45,17 +48,20 @@ def unpack_args(func):
         return wrapper
     else:
         return func
-def my_arange(a, b, dr, decimals=6):
-   res = [a]
-   k = 1
-   while res[-1] < b:
-       tmp = round(a + k*dr,decimals)
-       if tmp > b:
-           break  
-       res.append(tmp)
-       k+=1
 
-   return np.asarray(res)
+
+def my_arange(a, b, dr, decimals=6):
+    res = [a]
+    k = 1
+    while res[-1] < b:
+        tmp = round(a + k*dr, decimals)
+        if tmp > b:
+            break
+        res.append(tmp)
+        k += 1
+
+    return np.asarray(res)
+
 
 def dbm2w(dBm):
     """This function converts a power given in dBm to a power given in W.
@@ -98,8 +104,8 @@ class raman_object(object):
             #print('Raman on')
             if self.how == 'analytic':
                 print(self.how)
-                t11 = 12.2e-3	  # [ps]
-                t2 = 32e-3		 # [ps]
+                t11 = 12.2e-3     # [ps]
+                t2 = 32e-3       # [ps]
                 # analytical response
                 htan = (t11**2 + t2**2)/(t11*t2**2) * \
                     np.exp(-t/t2*(t >= 0))*np.sin(t/t11)*(t >= 0)
@@ -133,7 +139,6 @@ def dispersion_operator(betas, lamda_c, int_fwm, sim_wind):
     c_norm = c*1e-12  # Speed of light [m/ps] #Central wavelength [nm]
     wc = 2*pi * c_norm / sim_wind.lamda
     w0 = 2*pi * c_norm / lamda_c
-
 
     betap = np.zeros_like(betas)
 
@@ -224,8 +229,8 @@ class sim_window(object):
         self.deltaf = np.max(self.fv) - np.min(self.fv)  # [THz]
         self.df = self.deltaf/int_fwm.nt  # [THz]
         self.T = 1/self.df  # Time window (period)[ps]
-        #print(self.fmed,c/lamda)
-        #sys.exit()
+        # print(self.fmed,c/lamda)
+        # sys.exit()
         self.woffset = 2*pi*(self.fmed - c/lamda)*1e-12  # [rad/ps]
         # [rad/ps] Offset of central freequency and that of the experiment
         self.woffset2 = 2*pi*(self.fmed - c/lamda_c)*1e-12
@@ -234,17 +239,17 @@ class sim_window(object):
         self.w0 = 2*pi*self.fmed  # central angular frequency [rad/s]
 
         self.tsh = 1/self.w0*1e12  # shock time [ps]
-        self.dt = self.T/int_fwm.nt  # timestep (dt)	 [ps]
-        # time vector	   [ps]
+        self.dt = self.T/int_fwm.nt  # timestep (dt)     [ps]
+        # time vector      [ps]
         self.t = (range(int_fwm.nt)-np.ones(int_fwm.nt)*int_fwm.nt/2)*self.dt
         # angular frequency vector [rad/ps]
         self.w = 2*pi * np.append(
             range(0, int(int_fwm.nt/2)),
             range(int(-int_fwm.nt/2), 0, 1))/self.T
         #self.w = fftshift(2*pi *(self.fv - 1e-12*self.fmed))
-        #plt.plot(self.w)
-        #plt.savefig('w.png')
-        #sys.exit()
+        # plt.plot(self.w)
+        # plt.savefig('w.png')
+        # sys.exit()
         # frequency vector[THz] (shifted for plotting)
         # wavelength vector [nm]
         self.lv = 1e-3*c/self.fv
@@ -255,31 +260,30 @@ class sim_window(object):
             self.fmed*1e-12 - fv_idler_int, self.fmed*1e-12 + fv_idler_int)
 
         # for i in (self.fv,self.t, fftshift(self.w)):
-        #	check_ft_grid(i, np.abs(i[1] - i[0]))
+        #   check_ft_grid(i, np.abs(i[1] - i[0]))
 
 
-def idler_limits(sim_wind,U_original_pump, U,noise_obj):
+def idler_limits(sim_wind, U_original_pump, U, noise_obj):
 
     size = len(U[:, 0])
     pump_pos = np.argsort(U_original_pump)[-1]
     out_int = np.argsort(U[(pump_pos + 1):, 0])[-1]
 
     out_int += pump_pos
-    #print(1e-3*c/sim_wind.fv[pump_pos])
-    #print(1e-3*c/sim_wind.fv[out_int])
-    #sys.exit()
+    # print(1e-3*c/sim_wind.fv[pump_pos])
+    # print(1e-3*c/sim_wind.fv[out_int])
+    # sys.exit()
 
-    lhs_int = np.max(np.where(U[pump_pos+1:out_int-1,0]<= noise_obj.pquant_f)[0])
-    
-      
+    lhs_int = np.max(
+        np.where(U[pump_pos+1:out_int-1, 0] <= noise_obj.pquant_f)[0])
 
-    rhs_int = np.min(np.where(U[out_int+1:,0]<= noise_obj.pquant_f)[0])
+    rhs_int = np.min(np.where(U[out_int+1:, 0] <= noise_obj.pquant_f)[0])
 
     lhs_int += pump_pos
     rhs_int += out_int
-    lhs_int = out_int -20
-    rhs_int = out_int +20
-    #if lhs_int > out_int:
+    lhs_int = out_int - 20
+    rhs_int = out_int + 20
+    # if lhs_int > out_int:
     #    lhs_int = out_int - 10
 
     fv_id = (lhs_int, rhs_int)
@@ -361,9 +365,9 @@ class WDM(object):
         self.fv_wdm = self.omega*fv+self.phi
 
         # self.A = np.array([[np.reshape(np.cos(self.fv), (len(self.fv), modes)),
-        #						np.reshape(np.sin(self.fv), (len(self.fv), modes))],
-        #					   [-np.reshape(np.sin(self.fv), (len(self.fv), modes)),
-        #						np.reshape(np.cos(self.fv), (len(self.fv), modes))]])
+        #                       np.reshape(np.sin(self.fv), (len(self.fv), modes))],
+        #                      [-np.reshape(np.sin(self.fv), (len(self.fv), modes)),
+        # np.reshape(np.cos(self.fv), (len(self.fv), modes))]])
 
         eps = np.sin(self.fv_wdm)
         eps2 = 1j*np.cos(self.fv_wdm)
@@ -399,7 +403,7 @@ class WDM(object):
             #u_out += (UU,)
         return ((u_out[0], U_out[0]), (u_out[1], U_out[1]))
 
-    def il_port1(self,fv_sp = None):
+    def il_port1(self, fv_sp=None):
         """
         For visualisation of the wdm loss of port 1. If no input is given then it is plotted
         in the freequency vector that the function is defined by. You can however 
@@ -409,15 +413,15 @@ class WDM(object):
             return (np.sin(self.omega*self.fv+self.phi))**2
         else:
             return (np.sin(self.omega*(1e-3*c/fv_sp)+self.phi))**2
-    def il_port2(self,fv_sp = None):
+
+    def il_port2(self, fv_sp=None):
         """
         Like il_port1 but with cosine (oposite)
         """
         if fv_sp is None:
             return (np.cos(self.omega*self.fv+self.phi))**2
         else:
-            return (np.cos(self.omega*(1e-3*c/fv_sp) +self.phi))**2
-
+            return (np.cos(self.omega*(1e-3*c/fv_sp) + self.phi))**2
 
     def plot(self, filename=False, xlim=False):
         fig = plt.figure()
@@ -427,7 +431,7 @@ class WDM(object):
                  (self.l2) + ' nm port')
         plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.13), ncol=2)
         plt.xlabel(r'$\lambda (n m)$')
-        #plt.xlim()
+        # plt.xlim()
         plt.ylabel('Power Ratio')
         if xlim:
             plt.xlim(xlim)
@@ -499,27 +503,30 @@ class Splicer(WDM):
         U_out2 = 1j * U_in[0] * self.c2 + U_in[1] * self.c1
         return U_out1, U_out2
 
+
 def norm_const(u, sim_wind):
-        t = sim_wind.t
-        fv = sim_wind.fv
-        U_temp = fftshift(fft(u))
-        first_int = simps(np.abs(U_temp)**2, fv)
-        second_int = simps(np.abs(u)**2,t)
-        return (first_int/second_int)**0.5
+    t = sim_wind.t
+    fv = sim_wind.fv
+    U_temp = fftshift(fft(u))
+    first_int = simps(np.abs(U_temp)**2, fv)
+    second_int = simps(np.abs(u)**2, t)
+    return (first_int/second_int)**0.5
+
 
 class Noise(object):
 
-    def __init__(self,int_fwm, sim_wind):
+    def __init__(self, int_fwm, sim_wind):
         self.pquant = np.sum(
             1.054e-34*(sim_wind.w*1e12 + sim_wind.w0)/(sim_wind.T*1e-12))
-        #print(self.pquant**0.5)
+        # print(self.pquant**0.5)
         self.pquant = (self.pquant/2)**0.5
-        self.pquant_f = np.mean(np.abs(self.noise_func_freq(int_fwm, sim_wind))**2)
+        self.pquant_f = np.mean(
+            np.abs(self.noise_func_freq(int_fwm, sim_wind))**2)
         return None
 
     def noise_func(self, int_fwm):
         seed = np.random.seed(int(time()*np.random.rand()))
-        noise =  self.pquant * (np.random.randn(int_fwm.nt)
+        noise = self.pquant * (np.random.randn(int_fwm.nt)
                                + 1j*np.random.randn(int_fwm.nt))
         return noise
 
@@ -528,13 +535,13 @@ class Noise(object):
         noise_freq = fftshift(fft(noise))
         return noise_freq
 #import warnings
-#warnings.filterwarnings("error")
+# warnings.filterwarnings("error")
 
 
 def pulse_propagation(u, U, int_fwm, M, sim_wind, hf, Dop, dAdzmm):
     """Pulse propagation"""
-    #badz = 0  # counter for bad steps
-    #goodz = 0  # counter for good steps
+    # badz = 0  # counter for bad steps
+    # goodz = 0  # counter for good steps
     dztot = 0  # total distance traveled
     #dzv = np.zeros(1)
     #dzv[0] = int_fwm.dz
@@ -549,8 +556,8 @@ def pulse_propagation(u, U, int_fwm, M, sim_wind, hf, Dop, dAdzmm):
             while delta > int_fwm.maxerr:
                 u1new = ifft(np.exp(Dop*dz/2)*fft(u1))
                 A, delta = RK45CK(dAdzmm, u1new, dz, M, int_fwm.n2,
-                                 sim_wind.lamda, sim_wind.tsh,
-                                 sim_wind.dt, hf, sim_wind.w_tiled)
+                                  sim_wind.lamda, sim_wind.tsh,
+                                  sim_wind.dt, hf, sim_wind.w_tiled)
                 if (delta > int_fwm.maxerr):
                     # calculate the step (shorter) to redo
                     dz *= Safety*(int_fwm.maxerr/delta)**0.25
@@ -570,7 +577,8 @@ def pulse_propagation(u, U, int_fwm, M, sim_wind, hf, Dop, dAdzmm):
             # # without exceeding max dzstep
             try:
                 dz = np.min(
-                [Safety*dz*(int_fwm.maxerr/delta)**0.2, Safety*int_fwm.dzstep])
+                    [Safety*dz*(int_fwm.maxerr/delta)**0.2,
+                     Safety*int_fwm.dzstep])
             except RuntimeWarning:
                 dz = Safety*int_fwm.dzstep
             #dz = 0.95*dz*(int_fwm.maxerr/delta)**0.2
@@ -606,8 +614,7 @@ def dbm_nm(U, sim_wind, int_fwm):
     return U_out
 
 
-
-def fv_creator(lam_p1,lams,int_fwm,prot_casc = 0):
+def fv_creator(lam_p1, lams, int_fwm, prot_casc=0):
     """
     Creates the freequency grid of the simmualtion and returns it.
     The conceprt is that the pump freq is the center. (N/4 - prot_casc) steps till the 
@@ -624,33 +631,33 @@ def fv_creator(lam_p1,lams,int_fwm,prot_casc = 0):
     #prot_casc = 1024
     N = int_fwm.nt
     fp = 1e-3*c / lam_p1
-    fs = 1e-3*c /lams
+    fs = 1e-3*c / lams
 
     sig_pump_shave = N//16
-    f_med = np.linspace(fs,fp,sig_pump_shave - prot_casc)
+    f_med = np.linspace(fs, fp, sig_pump_shave - prot_casc)
     d = f_med[1] - f_med[0]
     diff = N//4 - sig_pump_shave
 
-    f_2 =  [f_med[0],]
-    for i in range(1,N//4 +1 +diff//2+ prot_casc//2):
-        f_2.append(f_2[i-1]- d)
+    f_2 = [f_med[0], ]
+    for i in range(1, N//4 + 1 + diff//2 + prot_casc//2):
+        f_2.append(f_2[i-1] - d)
     f_2 = f_2[1:]
     f_2.sort()
-    f_1 = [f_med[-1],]
-    for i in range(1,N//2 +1 +diff//2+ prot_casc//2):
-        f_1.append(f_1[i-1] +d)
+    f_1 = [f_med[-1], ]
+    for i in range(1, N//2 + 1 + diff//2 + prot_casc//2):
+        f_1.append(f_1[i-1] + d)
     f_1 = f_1[1:]
     f_1.sort()
     f_med.sort()
 
-    
-    fv = np.concatenate((f_1,f_med,f_2))
+    fv = np.concatenate((f_1, f_med, f_2))
     fv.sort()
     s_pos = np.where(fv == fs)[0][0]
     p_pos = np.where(fv == fp)[0][0]
-    where = [p_pos,s_pos]
+    where = [p_pos, s_pos]
     check_ft_grid(fv, d)
-    return fv,where
+    return fv, where
+
 
 def energy_conservation(entot):
     if not(np.allclose(entot, entot[0])):
@@ -673,10 +680,9 @@ def check_ft_grid(fv, diff):
     if np.log2(np.shape(fv)[0]) == int(np.log2(np.shape(fv)[0])):
         nt = np.shape(fv)[0]
     else:
-        print(            "fix the grid for optimization\
-             of the fft's, grid:" +str(np.shape(fv)[0]))
+        print("fix the grid for optimization\
+             of the fft's, grid:" + str(np.shape(fv)[0]))
         sys.exit(1)
-
 
     lvio = []
     for i in range(len(fv)-1):
@@ -701,8 +707,8 @@ class create_destroy(object):
         return None
 
     def cleanup_folder(self):
-        #for i in range(len(self.variable)):
-        os.system('mv output'+self.pump_wave +' output_dump/')
+        # for i in range(len(self.variable)):
+        os.system('mv output'+self.pump_wave + ' output_dump/')
         return None
 
     def prepare_folder(self):
@@ -722,6 +728,7 @@ def power_idler(spec, fv, sim_wind, fv_id):
     fv_id: tuple of the starting and
     ending index at which the idler is calculated
     """
-    E_out = simps((sim_wind.t[1] - sim_wind.t[0])**2 * np.abs(spec[fv_id[0]:fv_id[1], 0])**2, fv[fv_id[0]:fv_id[1]])
+    E_out = simps((sim_wind.t[1] - sim_wind.t[0])**2 *
+                  np.abs(spec[fv_id[0]:fv_id[1], 0])**2, fv[fv_id[0]:fv_id[1]])
     P_bef = E_out/(2*np.max(sim_wind.t))
     return P_bef
