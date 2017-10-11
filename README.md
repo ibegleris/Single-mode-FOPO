@@ -12,5 +12,8 @@ There is now a build script that downloads and installs miniconda with all the e
 
 
 References:
+
+
 [1] I. Begleris and P. Horak, "Stability of a Fiber Optical Parametric Oscillator With and Without a Seed Signal," in Frontiers in Optics 2017, OSA Technical Digest (online) (Optical Society of America, 2017), paper JW4A.89. 
+
 [2] I. Begleris and P. Horak, "Cascade simulations of unidirectional fiber optical parametric oscillators," in 2017 International Conference on Numerical Simulation of Optoelectronic Devices (NUSOD)
