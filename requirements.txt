@@ -1,0 +1,14 @@
+numpy
+scipy
+matplotlib
+jupyter
+pandas
+h5py
+pytables
+jupyter
+numba
+pytest
+nose
+cython
+joblib
+pytest
