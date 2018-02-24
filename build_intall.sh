@@ -18,7 +18,7 @@ conda install numpy scipy matplotlib jupyter pandas h5py pytables jupyter numba 
 conda install python=3.6 -y
 if [ "$1" != 'cluster' ]; then
 	sudo apt-get update
-	sudo apt install libopenmpi-dev
+	sudo apt install libopenmpi-dev -y 
 	sudo apt-get install mpich -y 
 fi
 echo 'export PATH="/home/$USER/miniconda/bin:$PATH"' >> ~/.bashrc
