@@ -28,4 +28,4 @@ python setup.py build
 python setup.py install
 cd ..
 rm -rf mpi4py
-pytest unittesting_scripts.py
+#pytest unittesting_scripts.py
