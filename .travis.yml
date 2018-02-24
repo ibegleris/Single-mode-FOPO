@@ -7,4 +7,4 @@ install:
   - bash build_intall.sh
 # command to run tests
 script:
-  - bash run_testing.sh
+  - export PATH="$HOME/miniconda/bin:$PATH"; source activate intel; pytest unittesting_scripts.py
