@@ -6,4 +6,4 @@ install:
   - bash build_intall.sh
 # command to run tests
 script:
-  - pytest unittesting_scripts.py
+  - bash run_testing.sh
