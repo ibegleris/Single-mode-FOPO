@@ -21,8 +21,8 @@ warnings.filterwarnings("ignore")
 "---------------------------------W and dbm conversion tests--------------"
 
 
-def test_mpi4py_futures():
-    import mpi4py.futures
+#def test_mpi4py_futures():
+#    import mpi4py.futures
 
 
 def test_dbm2w():
