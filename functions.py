@@ -17,8 +17,7 @@ from scipy.fftpack import fft, ifft
 phasor = np.vectorize(cmath.polar)
 import warnings
 from functools import wraps
-from mpi4py import MPI
-rank = MPI.COMM_WORLD.Get_rank()
+
 
 
 def arguments_determine(j):
