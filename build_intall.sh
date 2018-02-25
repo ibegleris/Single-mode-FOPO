@@ -8,13 +8,15 @@ conda update conda -y
 conda config --add channels intel
 conda create -n intel intelpython3_core python=3
 source activate intel
-conda install cython numpy scipy matplotlib pandas h5py pytables jupyter joblib numba nose pytest -y
+conda install cython numpy scipy matplotlib pandas h5py pytables jupyter joblib numba nose -y
+conda install  pytest=3.3 -y
 source deactivate
 rm -rf ~/.condarc
 mv build_data/.condarc_default ~/.condarc
 mv build_data/.condarc_default ~/miniconda/envs/intel/.condarc
 conda update conda -y
-conda install numpy scipy matplotlib jupyter pandas h5py pytables jupyter numba nose pytest -y
+conda install numpy scipy matplotlib jupyter pandas h5py pytables jupyter numba nose -y
+conda install  pytest=3.3 -y
 conda install python=3.6 -y
 if [ "$1" != 'cluster' ]; then
 	sudo apt-get -qq update
