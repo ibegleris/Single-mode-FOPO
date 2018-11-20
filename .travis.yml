@@ -9,4 +9,5 @@ install:
 script:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - source activate intel
+   - python --version
   - pytest code_testing/test*.py
