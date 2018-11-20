@@ -8,7 +8,7 @@ conda update conda -y
 conda config --add channels intel
 conda create -n intel intelpython3_core python=3
 source activate intel
-conda install cython numpy scipy matplotlib pandas h5py pytables jupyter joblib numba nose -y
+conda install cython numpy scipy matplotlib pandas h5py pytables jupyter joblib numba nose sympy -y
 conda install  pytest=3.3 -y
 source deactivate
 rm -rf ~/.condarc
@@ -22,6 +22,8 @@ if [ "$1" != 'cluster' ]; then
 	sudo apt-get -qq update
 	sudo apt install libopenmpi-dev -y 
 	sudo apt-get install mpich -y 
+else
+	module load mpich/3.2.1
 fi
 echo 'export PATH="/home/$USER/miniconda/bin:$PATH"' >> ~/.bashrc
 source activate intel
@@ -31,4 +33,3 @@ python setup.py build
 python setup.py install
 cd ..
 rm -rf mpi4py
-#pytest unittesting_scripts.py
